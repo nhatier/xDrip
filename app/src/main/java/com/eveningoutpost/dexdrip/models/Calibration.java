@@ -147,6 +147,25 @@ class Li2AppParameters extends SlopeParameters {
     }
 }
 
+class Li2AppParametersNonFixed extends SlopeParameters {
+    Li2AppParametersNonFixed() {
+        LOW_SLOPE_1 = 0.55;
+        LOW_SLOPE_2 = 0.50;
+        HIGH_SLOPE_1 = 1.5;
+        HIGH_SLOPE_2 = 1.6;
+        DEFAULT_LOW_SLOPE_LOW = 0.55;
+        DEFAULT_LOW_SLOPE_HIGH = 0.50;
+        DEFAULT_SLOPE = 1;
+        DEFAULT_HIGH_SLOPE_HIGH = 1.5;
+        DEFAULT_HIGH_SLOPE_LOW = 1.4;
+    }
+
+    @Override
+    public double restrictIntercept(double intercept) {
+        return Math.min(Math.max(intercept, -40), 20);
+    }
+}
+
 class TestParameters extends SlopeParameters {
     TestParameters() {
         LOW_SLOPE_1 = 0.85; //0.95
@@ -807,7 +826,11 @@ public class Calibration extends Model {
     private static SlopeParameters getSlopeParameters() {
 
         if (CollectionServiceStarter.isLibre2App((Context)null)) {
-            return new Li2AppParameters();
+            if (Pref.getBooleanDefaultFalse("use_non_fixed_li_parameters")) {
+                return new Li2AppParametersNonFixed();
+            } else {
+                return new Li2AppParameters();
+            }
         }
 
         if (CollectionServiceStarter.isLimitter()) {
